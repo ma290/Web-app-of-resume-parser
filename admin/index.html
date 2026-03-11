@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ClinicAI — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f4ff;
+  --card:#fff;
+  --border:#e2e8f0;
+  --accent:#2563eb;
+  --accent2:#7c3aed;
+  --text:#0f172a;
+  --muted:#64748b;
+  --success:#16a34a;
+  --danger:#dc2626;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+nav{background:white;border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;}
+.logo{font-weight:800;font-size:1.2rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.nav-badge{font-size:0.75rem;background:#f0f4ff;border:1px solid var(--border);border-radius:100px;padding:4px 12px;color:var(--muted);font-weight:500;}
+
+.container{max-width:780px;margin:0 auto;padding:32px 24px;}
+
+h2{font-size:1.5rem;font-weight:700;margin-bottom:6px;}
+.page-sub{color:var(--muted);font-size:0.9rem;margin-bottom:32px;}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px;}
+
+.card-title{font-weight:700;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr;}}
+.form-full{grid-column:1/-1;}
+
+.field{display:flex;flex-direction:column;gap:6px;}
+label{font-size:0.78rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;}
+
+input,textarea,select{
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  padding:11px 14px;
+  font-size:0.88rem;
+  font-family:'Inter',sans-serif;
+  color:var(--text);
+  outline:none;
+  transition:border 0.2s;
+  background:white;
+  width:100%;
+}
+input:focus,textarea:focus{border-color:var(--accent);}
+textarea{resize:vertical;min-height:80px;}
+.field-note{font-size:0.72rem;color:var(--muted);}
+
+.save-btn{
+  width:100%;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:12px;
+  padding:14px;color:white;
+  font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:700;
+  cursor:pointer;transition:all 0.2s;margin-top:8px;
+}
+.save-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(37,99,235,0.35);}
+.save-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+
+/* Embed code */
+.embed-card{background:linear-gradient(135deg,#eff6ff,#f5f3ff);border:1px solid #bfdbfe;border-radius:16px;padding:28px;margin-bottom:20px;display:none;}
+.embed-card.show{display:block;}
+.embed-title{font-weight:700;font-size:1rem;margin-bottom:6px;color:var(--accent);}
+.embed-sub{font-size:0.82rem;color:var(--muted);margin-bottom:16px;}
+
+.code-block{
+  background:#0f172a;border-radius:10px;padding:16px;
+  font-family:'JetBrains Mono',monospace;font-size:0.78rem;
+  color:#7dd3fc;line-height:1.6;position:relative;
+  overflow-x:auto;
+}
+.copy-btn{
+  position:absolute;top:10px;right:10px;
+  background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);
+  border-radius:6px;padding:4px 10px;color:#94a3b8;
+  font-size:0.7rem;cursor:pointer;font-family:'Inter',sans-serif;
+  transition:all 0.2s;
+}
+.copy-btn:hover{background:rgba(255,255,255,0.2);color:white;}
+
+.success-msg{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px 16px;color:var(--success);font-size:0.85rem;font-weight:600;margin-top:12px;display:none;}
+.success-msg.show{display:block;}
+
+.error-msg{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px 16px;color:var(--danger);font-size:0.85rem;margin-top:12px;display:none;}
+.error-msg.show{display:block;}
+
+/* Preview link */
+.preview-link{display:inline-flex;align-items:center;gap:6px;margin-top:16px;color:var(--accent);font-size:0.85rem;font-weight:600;text-decoration:none;border:1.5px solid #bfdbfe;border-radius:8px;padding:8px 14px;transition:all 0.2s;}
+.preview-link:hover{background:var(--accent);color:white;border-color:var(--accent);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">ClinicAI Admin</div>
+  <div class="nav-badge">Setup Panel</div>
+</nav>
+
+<div class="container">
+  <h2>Setup Your AI Receptionist</h2>
+  <p class="page-sub">Fill in your clinic details below. Your AI chatbot will be ready in seconds.</p>
+
+  <div class="card">
+    <div class="card-title">🏥 Clinic Information</div>
+    <div class="form-grid">
+
+      <div class="field form-full">
+        <label>Clinic ID <span style="color:#dc2626">*</span></label>
+        <input type="text" id="clinicId" placeholder="e.g. citycare-delhi (no spaces, lowercase)" />
+        <div class="field-note">This will be your unique identifier. Use only letters, numbers, hyphens.</div>
+      </div>
+
+      <div class="field form-full">
+        <label>Clinic Name <span style="color:#dc2626">*</span></label>
+        <input type="text" id="clinicName" placeholder="e.g. City Care Clinic" />
+      </div>
+
+      <div class="field form-full">
+        <label>Doctors (one per line) <span style="color:#dc2626">*</span></label>
+        <textarea id="doctors" placeholder="Dr. Sharma (General Physician)&#10;Dr. Priya (Gynecology)&#10;Dr. Ahmed (Pediatrics)"></textarea>
+      </div>
+
+      <div class="field form-full">
+        <label>Clinic Timings <span style="color:#dc2626">*</span></label>
+        <input type="text" id="timings" placeholder="e.g. Mon-Sat 9AM-8PM, Sunday Closed" />
+      </div>
+
+      <div class="field form-full">
+        <label>Services Offered (comma separated)</label>
+        <textarea id="services" placeholder="General checkup, Blood tests, X-Ray, Vaccinations, Pediatrics"></textarea>
+      </div>
+
+      <div class="field form-full">
+        <label>Clinic Address</label>
+        <input type="text" id="location" placeholder="e.g. 123 Main Street, New Delhi" />
+      </div>
+
+      <div class="field">
+        <label>Phone Number <span style="color:#dc2626">*</span></label>
+        <input type="text" id="phone" placeholder="+91 98765 43210" />
+      </div>
+
+      <div class="field">
+        <label>Response Language</label>
+        <select id="language">
+          <option value="English">English</option>
+          <option value="Hindi">Hindi</option>
+          <option value="Hinglish">Hinglish (Hindi + English)</option>
+          <option value="Urdu">Urdu</option>
+          <option value="Tamil">Tamil</option>
+          <option value="Telugu">Telugu</option>
+        </select>
+      </div>
+
+      <div class="field form-full">
+        <label>Appointment Booking Instructions</label>
+        <input type="text" id="appointmentMsg" placeholder="Call +91 98765 43210 or visit us directly to book" />
+        <div class="field-note">The AI will say this when patients ask about booking appointments.</div>
+      </div>
+
+    </div>
+
+    <button class="save-btn" onclick="saveClinic()" id="saveBtn">
+      ✨ Generate My Chatbot
+    </button>
+
+    <div class="success-msg" id="successMsg"></div>
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+
+  <!-- Embed Code — shown after save -->
+  <div class="embed-card" id="embedCard">
+    <div class="embed-title">🎉 Your chatbot is ready!</div>
+    <div class="embed-sub">Copy this one line of code and paste it in your website's HTML, just before the &lt;/body&gt; tag.</div>
+
+    <div class="code-block" id="embedCode">
+      <button class="copy-btn" onclick="copyCode()">Copy</button>
+      <span id="codeText"></span>
+    </div>
+
+    <a class="preview-link" id="previewLink" href="#" target="_blank">
+      👁 Preview Chatbot
+    </a>
+  </div>
+
+</div>
+
+<script>
+  // Replace with your actual deployed backend URL
+  const API_BASE = "https://asyoucansee-mistral.hf.space";
+  // Replace with your deployed widget URL
+  const WIDGET_BASE = "alleged-allyce-namezakikr-5ffd6ac9.koyeb.app";
+
+  async function saveClinic() {
+    const btn = document.getElementById('saveBtn');
+    const successMsg = document.getElementById('successMsg');
+    const errorMsg = document.getElementById('errorMsg');
+
+    successMsg.classList.remove('show');
+    errorMsg.classList.remove('show');
+
+    const id       = document.getElementById('clinicId').value.trim().toLowerCase().replace(/\s+/g,'-');
+    const name     = document.getElementById('clinicName').value.trim();
+    const doctors  = document.getElementById('doctors').value.trim().split('\n').filter(Boolean);
+    const timings  = document.getElementById('timings').value.trim();
+    const services = document.getElementById('services').value.trim().split(',').map(s=>s.trim()).filter(Boolean);
+    const location = document.getElementById('location').value.trim();
+    const phone    = document.getElementById('phone').value.trim();
+    const language = document.getElementById('language').value;
+    const appointmentMsg = document.getElementById('appointmentMsg').value.trim() || `Call ${phone} to book an appointment.`;
+
+    if (!id || !name || !doctors.length || !timings || !phone) {
+      errorMsg.textContent = '⚠ Please fill in all required fields (marked with *)';
+      errorMsg.classList.add('show');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    try {
+      const res = await fetch(`${API_BASE}/clinic`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, name, doctors, timings, services, location, phone, language, appointment_msg: appointmentMsg })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.detail || 'Failed to save');
+
+      // Show embed code
+      const embedLine = `<script src="${WIDGET_BASE}/widget.js?id=${id}"><\/script>`;
+      document.getElementById('codeText').textContent = embedLine;
+      document.getElementById('previewLink').href = `${WIDGET_BASE}/?id=${id}`;
+      document.getElementById('embedCard').classList.add('show');
+
+      successMsg.textContent = `✅ Clinic "${name}" registered! Your chatbot is live.`;
+      successMsg.classList.add('show');
+
+      document.getElementById('embedCard').scrollIntoView({ behavior: 'smooth' });
+
+    } catch(e) {
+      errorMsg.textContent = '⚠ Error: ' + e.message;
+      errorMsg.classList.add('show');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '✨ Generate My Chatbot';
+    }
+  }
+
+  function copyCode() {
+    const text = document.getElementById('codeText').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    });
+  }
+</script>
+</body>
+</html>
