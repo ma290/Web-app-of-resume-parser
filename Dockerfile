@@ -1,11 +1,20 @@
 FROM nginx:alpine
 
-# Copy web app
-COPY index.html /usr/share/nginx/html/index.html
+# Copy widget (served at /widget.js and /)
+COPY widget/index.html /usr/share/nginx/html/index.html
 
-# HuggingFace Spaces uses port 7860
-RUN sed -i 's/listen       80;/listen       7860;/' /etc/nginx/conf.d/default.conf
+# Copy admin panel
+COPY admin/index.html /usr/share/nginx/html/admin/index.html
 
-EXPOSE 7860
+# Nginx config for Koyeb port 8000
+RUN printf 'server {\n\
+    listen 8000;\n\
+    root /usr/share/nginx/html;\n\
+    index index.html;\n\
+    location / { try_files $uri $uri/ /index.html; }\n\
+    location /admin { try_files $uri $uri/ /admin/index.html; }\n\
+}\n' > /etc/nginx/conf.d/default.conf
+
+EXPOSE 8000
 
 CMD ["nginx", "-g", "daemon off;"]
